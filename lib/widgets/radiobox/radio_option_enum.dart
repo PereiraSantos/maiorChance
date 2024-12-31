@@ -1,0 +1,1 @@
+enum RadioOptionEnum { megasena, lotofacil }
