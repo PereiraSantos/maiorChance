@@ -1,5 +1,4 @@
 import 'package:excel/excel.dart';
-import 'package:maior_chance/generate_game/entities/lottery.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 
 class OpenFile {
@@ -13,30 +12,6 @@ class OpenFile {
     ByteData data = await rootBundle.load('assets/loto_facil.xlsx');
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     return Excel.decodeBytes(bytes);
-  }
-
-  Future<List<Lottery>> buildLottery() async {
-    var excel = await _open();
-
-    List<Lottery> list = [];
-
-    for (var table in excel.tables.keys) {
-      for (var row in excel.tables[table]!.rows) {
-        list.add(
-          Lottery(
-              contest: (row[0]?.value).toString(),
-              date: (row[1]?.value).toString(),
-              one: int.parse((row[2]?.value).toString()),
-              two: int.parse((row[3]?.value).toString()),
-              three: int.parse((row[4]?.value).toString()),
-              four: int.parse((row[5]?.value).toString()),
-              five: int.parse((row[6]?.value).toString()),
-              six: int.parse((row[7]?.value).toString())),
-        );
-      }
-    }
-
-    return list;
   }
 
   Future<List<int>> buildBettingRaffle() async {
