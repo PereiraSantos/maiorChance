@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:maior_chance/database/app_database.dart';
+import 'package:maior_chance/generate_game/entities/lottery.dart';
 
 class ExpansionTileWidgets extends StatefulWidget {
   const ExpansionTileWidgets({
     super.key,
     required this.label,
     required this.onClickGeneratesGame,
-    required this.onClickCompare,
+    required this.onClickInsert,
+    required this.type,
   });
 
   final String label;
   final List<int> Function() onClickGeneratesGame;
-  final Function(List<int>) onClickCompare;
+  final Function(List<int>) onClickInsert;
+  final int type;
 
   @override
   State<ExpansionTileWidgets> createState() => _ExpansionTileWidgetsState();
@@ -18,6 +22,11 @@ class ExpansionTileWidgets extends StatefulWidget {
 
 class _ExpansionTileWidgetsState extends State<ExpansionTileWidgets> {
   List<int> game = [];
+
+  Future<List<Lottery>?> fintLotteryByType() async {
+    AppDatabase appDatabase = await getInstance();
+    return await appDatabase.lotteryDao.fintLotteryByType(widget.type);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,39 +47,36 @@ class _ExpansionTileWidgetsState extends State<ExpansionTileWidgets> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Container(
-                      width: double.maxFinite,
-                      height: 25,
-                      margin: EdgeInsets.only(left: 15, right: 15),
+              Padding(
+                padding: const EdgeInsets.only(left: 15, right: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(20, 25),
+                      ),
+                      onPressed: () {
+                        game = widget.onClickGeneratesGame();
+                        setState(() {});
+                      },
+                      child: const Text('Gerar números', style: TextStyle(color: Colors.black87)),
+                    ),
+                    Visibility(
+                      visible: game.isNotEmpty,
                       child: ElevatedButton(
-                        onPressed: () async {
-                          game = widget.onClickGeneratesGame();
-                          setState(() {});
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(60, 25),
+                        ),
+                        onPressed: () {
+                          widget.onClickInsert(game);
+                          setState(() => game = []);
                         },
-                        child: const Text('Gerar números', style: TextStyle(color: Colors.grey)),
+                        child: const Text('Salvar jogo', style: TextStyle(color: Colors.black87)),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      width: double.maxFinite,
-                      height: 20,
-                      margin: EdgeInsets.only(right: 15),
-                      /* child: ElevatedButton(
-                        onPressed: () async {
-                          if (game.isEmpty) return;
-                          widget.onClickCompare(game);
-                          setState(() {});
-                        },
-                        child: const Text('Verificar jogo', style: TextStyle(color: Colors.grey)),
-                      ),*/
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Visibility(
                 visible: game.isNotEmpty,
@@ -82,6 +88,49 @@ class _ExpansionTileWidgetsState extends State<ExpansionTileWidgets> {
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
                 child: Text(game.join(' - ')),
+              ),
+              FutureBuilder(
+                future: fintLotteryByType(),
+                builder: (BuildContext context, AsyncSnapshot<List<Lottery>?> snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data!.isNotEmpty) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15.0),
+                            child: Text('Jogos registrados', style: TextStyle(fontSize: 18)),
+                          ),
+                          ListView.separated(
+                            itemCount: snapshot.data!.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            separatorBuilder: (context, index) {
+                              return const Divider(endIndent: 15, indent: 15, height: 1, color: Colors.black12);
+                            },
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 15, right: 15),
+                                child: Text(snapshot.data![index].toString()),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const Center(
+                        child: Text(
+                          "Não há jogos registrado!!!",
+                          style: TextStyle(fontSize: 18, color: Colors.black54, fontWeight: FontWeight.w300),
+                        ),
+                      );
+                    }
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
               ),
             ],
           ),
