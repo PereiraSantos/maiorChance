@@ -77,21 +77,21 @@ class Lottery {
   @override
   String toString() {
     var result = '';
-    if (one != null) result += '$one ';
-    if (two != null) result += '- $two ';
-    if (three != null) result += '- $three ';
-    if (four != null) result += '- $four ';
-    if (five != null) result += '- $five ';
-    if (six != null) result += '- $six ';
-    if (seven != null) result += '- $seven ';
-    if (eight != null) result += '- $eight';
-    if (nine != null) result += '- $nine ';
-    if (ten != null) result += '- $ten ';
-    if (eleven != null) result += '- $eleven ';
-    if (twelve != null) result += '- $twelve ';
-    if (thirteen != null) result += '- $thirteen ';
-    if (fourteen != null) result += '- $fourteen ';
-    if (fifteen != null) result += '- $fifteen ';
+    if (one != null) result += '$one';
+    if (two != null) result += ', $two';
+    if (three != null) result += ', $three';
+    if (four != null) result += ', $four';
+    if (five != null) result += ', $five';
+    if (six != null) result += ', $six';
+    if (seven != null) result += ', $seven';
+    if (eight != null) result += ', $eight';
+    if (nine != null) result += ', $nine';
+    if (ten != null) result += ', $ten';
+    if (eleven != null) result += ', $eleven';
+    if (twelve != null) result += ', $twelve';
+    if (thirteen != null) result += ', $thirteen';
+    if (fourteen != null) result += ', $fourteen';
+    if (fifteen != null) result += ', $fifteen';
 
     return result;
   }

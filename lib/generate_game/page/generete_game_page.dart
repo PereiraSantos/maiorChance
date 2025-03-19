@@ -3,7 +3,7 @@ import 'package:maior_chance/database/app_database.dart';
 import 'package:maior_chance/generate_game/entities/lottery.dart';
 import 'package:maior_chance/generate_game/usercases/betting.dart';
 import 'package:maior_chance/generate_game/usercases/cache_old_game.dart';
-import 'package:maior_chance/generate_game/usercases/find_betting.dart';
+import 'package:maior_chance/generate_game/usercases/open_file.dart';
 import 'package:maior_chance/utils/message_user.dart';
 import 'package:maior_chance/widgets/expansion_tile_widgets.dart';
 
@@ -16,7 +16,7 @@ class GenereteGamePage extends StatelessWidget {
   List<int> genereteGameBetting(int stop) {
     var betting = Betting(size: 60, limit: 5).create();
 
-    var result = FindBetting().find(CacheOldGame().bettingRaffle, int.parse(betting.join()));
+    var result = _getGame(CacheOldGame().bettingRaffle, betting.join('').toString());
 
     if (result == null || stop == 0) return betting;
     stop--;
@@ -26,12 +26,17 @@ class GenereteGamePage extends StatelessWidget {
   List<int> genereteGameLoto(int stop) {
     var betting = Betting(size: 25, limit: 15).create();
 
-    var result1 = FindBetting().find(CacheOldGame().bettingRaffleLoto1, int.parse(betting.sublist(0, 8).join('')));
-    var result2 = FindBetting().find(CacheOldGame().bettingRaffleLoto2, int.parse(betting.sublist(8, 14).join('')));
+    var result = _getGame(CacheOldGame().bettingRaffleLoto, betting.join('').toString());
 
-    if (result1 == null || result2 == null || stop == 0) return betting;
+    if (result == null || stop == 0) return betting;
     stop--;
     return genereteGameLoto(stop);
+  }
+
+  String? _getGame(Map<String, String> list, String value) {
+    String hash = OpenFile().getHash(value);
+    if (list.containsKey(hash)) return list[hash]!.toString();
+    return null;
   }
 
   @override

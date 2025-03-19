@@ -87,7 +87,7 @@ class _ExpansionTileWidgetsState extends State<ExpansionTileWidgets> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
-                child: Text(game.join(' - ')),
+                child: Text(game.join(', ')),
               ),
               FutureBuilder(
                 future: fintLotteryByType(),

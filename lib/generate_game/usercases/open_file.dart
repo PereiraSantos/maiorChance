@@ -1,5 +1,8 @@
+import 'dart:collection';
+
 import 'package:excel/excel.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
+import 'package:maior_chance/utils/hash.dart';
 
 class OpenFile {
   Future<Excel> _open() async {
@@ -14,79 +17,42 @@ class OpenFile {
     return Excel.decodeBytes(bytes);
   }
 
-  Future<List<int>> buildBettingRaffle() async {
+  Future<Map<String, String>> buildBettingRaffle() async {
     var excel = await _open();
 
-    List<int> list = [];
+    Map<String, String> list = HashMap();
 
     for (var table in excel.tables.keys) {
       for (var row in excel.tables[table]!.rows) {
-        String value = '${int.parse((row[2]?.value).toString())}'
-            '${int.parse((row[3]?.value).toString())}'
-            '${int.parse((row[4]?.value).toString())}'
-            '${int.parse((row[5]?.value).toString())}'
-            '${int.parse((row[6]?.value).toString())}'
-            '${int.parse((row[7]?.value).toString())}';
+        String value = '${(row[2]?.value)}${(row[3]?.value)}${(row[4]?.value)}${(row[5]?.value)}${(row[6]?.value)}${(row[7]?.value)}';
 
-        list.add(int.parse(value));
+        final hash = getHash(value);
+
+        list.addAll({hash: value});
       }
     }
 
-    return list..sort();
+    return list;
   }
 
-  Future<dynamic> buildBettingRaffleLoto() async {
+  Future<Map<String, String>> buildBettingRaffleLoto() async {
     var excel = await _openLoto();
 
-    List<int> list1 = [];
-    List<int> list2 = [];
+    Map<String, String> list = HashMap();
 
     for (var table in excel.tables.keys) {
       for (var row in excel.tables[table]!.rows) {
-        List<int> listTemp = [];
+        String value = '${(row[2])}${(row[3])}${(row[4])}${(row[5])}${(row[6])}${(row[7])}${(row[8])}${(row[9])}${(row[10])}${(row[11])}${(row[12])}'
+            '${(row[13])}${(row[14])}${(row[16])}${(row[16])}';
 
-        listTemp.add(int.parse((row[2]?.value).toString()));
-        listTemp.add(int.parse((row[3]?.value).toString()));
-        listTemp.add(int.parse((row[4]?.value).toString()));
-        listTemp.add(int.parse((row[5]?.value).toString()));
-        listTemp.add(int.parse((row[6]?.value).toString()));
-        listTemp.add(int.parse((row[7]?.value).toString()));
-        listTemp.add(int.parse((row[8]?.value).toString()));
-        listTemp.add(int.parse((row[9]?.value).toString()));
+        final hash = getHash(value);
 
-        listTemp.add(int.parse((row[10]?.value).toString()));
-        listTemp.add(int.parse((row[11]?.value).toString()));
-        listTemp.add(int.parse((row[12]?.value).toString()));
-        listTemp.add(int.parse((row[13]?.value).toString()));
-        listTemp.add(int.parse((row[14]?.value).toString()));
-        listTemp.add(int.parse((row[15]?.value).toString()));
-        listTemp.add(int.parse((row[16]?.value).toString()));
-
-        listTemp.sort();
-
-        String value = '${int.parse((listTemp[0]).toString())}'
-            '${int.parse((listTemp[1]).toString())}'
-            '${int.parse((listTemp[2]).toString())}'
-            '${int.parse((listTemp[3]).toString())}'
-            '${int.parse((listTemp[4]).toString())}'
-            '${int.parse((listTemp[5]).toString())}'
-            '${int.parse((listTemp[6]).toString())}'
-            '${int.parse((listTemp[7]).toString())}';
-
-        list1.add(int.parse(value));
-
-        value = '${num.parse((listTemp[8]).toString())}'
-            '${num.parse((listTemp[9]).toString())}'
-            '${num.parse((listTemp[10]).toString())}'
-            '${num.parse((listTemp[11]).toString())}'
-            '${num.parse((listTemp[12]).toString())}'
-            '${num.parse((listTemp[13]).toString())}'
-            '${num.parse((listTemp[14]).toString())}';
-
-        list2.add(int.parse(value));
+        list.addAll({hash: value});
       }
     }
 
-    return [list1..sort(), list2..sort()];
+    return list;
   }
+
+  String getHash(String value) => Hash().textToMd5(value);
 }
